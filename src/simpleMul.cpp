@@ -46,8 +46,8 @@ char *str2charl(string str) {
 /// @param str: string, main() argv[1] or argv[2]
 /// @return tuple<char *arrayHead, int arrayTail, int pLocation, bool
 /// isNegative>
-///   @retval arrayHead: the decimal part
-///   @retval arrayTail: ths power part
+///   @retval arrayHead: the input number, or its decimal part
+///   @retval arrayTail: ths power part, if input by scientific notation
 ///   @retval pLocation: decimal point position
 ///   @retval isNegative: the parity
 tuple<char *, int, int, bool> inputHandle(string str) {
@@ -140,7 +140,7 @@ tuple<char *, int, int, bool> inputHandle(string str) {
 /// @brief mul two input bit by bit to aviod data loss
 /// @param array1: char[], input in char[] form
 /// @param array2: char[], input in char[] form
-/// @return ret: string, could it start with '.'? no
+/// @return ret: string, could it start with '.'? -> no
 string hugeMul(char *array1, char *array2) {
   char res[strlen(array1) + strlen(array2)] = {0};
   for (int i = strlen(array1) - 1; i >= 0; i--) {
@@ -156,8 +156,8 @@ string hugeMul(char *array1, char *array2) {
   for (int i = 0; i < sizeof(res); i++) {
     retP[i] = res[i] + '0';
   }
-  // hint: use string ret(retP) directly could possiblely include the '\n', and
-  // will ruin the decimal point position calculation.
+  // hint: use string ret(retP) directly could possiblely include the unexpected val in memory, 
+  // then it will ruin the decimal point position calculation.
   string ret = "";
   for (int i = 0; i < sizeof(retP); i++) {
     // use push_back() to avoid the hint
