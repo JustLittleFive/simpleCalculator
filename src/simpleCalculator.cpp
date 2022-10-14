@@ -16,14 +16,16 @@
  */
 
 #include <iostream>
+#include <list>
 #include <map>
+#include <regex>
+#include <stack>
 #include <string>
 #include <vector>
-#include <stack>
 
 using namespace std;
 
-const string symbol = "+-*()/%^!$";
+const string symbol = "+-*/$^!%()";
 
 map<string, string> customVarible;
 
@@ -67,12 +69,13 @@ int main() {
   // }
   // std::cout << endl;
 
-  // sqrt and negative sign transfer
+  // sqrt / negative sign transfer and input check
   string invaildSymbolCombo = "+-*/^";
   for (int i = 0; i < seglist.size(); i++) {
     // std::cout << i << ": " << seglist[i] << endl;
     if (seglist[i].compare("sqrt") == 0) {
-      if (i < seglist.size() - 1 && symbol.find(seglist[i+1]) == string::npos) {
+      if (i < seglist.size() - 1 &&
+          symbol.find(seglist[i + 1]) == string::npos) {
         // std::cout << "hit!" << endl;
         seglist[i] = "$";
         seglist.erase(seglist.begin() + i + 1);
@@ -88,9 +91,20 @@ int main() {
         seglist[i + 1] = "-" + seglist[i + 1];
         seglist.erase(seglist.begin() + i);
         i--;
-      }
-      else {
+      } else {
         std::cout << "Invalid input!" << endl;
+      }
+    }
+  }
+  for (int i = 0; i < seglist.size(); i++) {
+    if (!regex_match(seglist[i],
+                     regex("(\\-){0,1}([0-9]+)(\\.[0-9]+){0,1}(\\e[0-9]+){0,1}",
+                           regex::icase))) {
+      map<string, string>::iterator l_it;
+      l_it = customVarible.find(seglist[i]);
+      if (l_it == customVarible.end()) {
+        cout << "Invalid input!" << endl;
+        // continue;
       }
     }
   }
@@ -110,13 +124,44 @@ int main() {
   //   std::cout << seglist[i];
   // }
 
-  stack<string> suffix;
-  stack<string> symbolStack;
-  for(int i = 0; i < seglist.size(); i++){
-    if(symbol.find(seglist[i]) == string::npos){
-      
+  // Infix expression to suffix expression
+  list<string> suffix;        // s2
+  stack<string> symbolStack;  // s1
+  for (int i = 0; i < seglist.size(); i++) {
+    if (symbol.find(seglist[i]) == string::npos) {
+      // if (regex_match(
+      //         seglist[i],
+      //         regex("(\\-){0,1}([0-9]+)(\\.[0-9]+){0,1}(\\e[0-9]+){0,1}",
+      //               regex::icase))) {
+      // } else {
+      //   cout << "Invalid input!" << endl;
+      //   // continue;
+      // }
+      suffix.push_back(seglist[i]);
+    }
+    if (seglist[i].compare("(") == 0) {
+      symbolStack.push(seglist[i]);
+    } else if (seglist[i].compare(")") == 0) {
+      while (symbolStack.top().compare("(") != 0) {
+        suffix.push_back(symbolStack.top());
+        symbolStack.pop();
+      }
+      symbolStack.pop();
+    } else {
+      while (!symbolStack.empty() &&
+             calcuLevel(seglist[i]) < calcuLevel(symbolStack.top())) {
+        suffix.push_back(symbolStack.top());
+        symbolStack.pop();
+      }
+      symbolStack.push(seglist[i]);
     }
   }
+  while (!symbolStack.empty()) {
+    suffix.push_back(symbolStack.top());
+    symbolStack.pop();
+  }
+
+  // Calculate start
 
   std::cout << endl;
   std::cout << "finish" << endl;
