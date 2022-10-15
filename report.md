@@ -2,6 +2,8 @@
 **Name:** Lv Yue  
 **SID:** 11710420
 
+***This project is hosted at https://github.com/JustLittleFive/simpleCalculator ***  
+
 ## Part1: Analysis  
 Project goal: Implement a much better calculator than that in Project 1.   
   
