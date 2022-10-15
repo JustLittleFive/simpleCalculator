@@ -15,6 +15,8 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #include <iostream>
 #include <list>
 #include <map>
@@ -24,6 +26,47 @@
 #include <vector>
 
 using namespace std;
-string calculate(string num1, string unaOperator){}
-string calculate(string num1, string num2, string biOperator){}
+string calculate(string num, string unaOperator) {
+  char op = unaOperator.at(0);
+  switch (op) {
+    case '$':
+      /* code */
+      if (num.find("e") != string::npos || num.find("E") != string::npos) {
+        cout << "Unsupported input!" << endl;
+        return NULL;
+        break;
+      }
+      if (num.find(".") != string::npos) {
+        double numOp = stod(num);
+        numOp = sqrt(numOp);
+        return to_string(numOp);
+        break;
+      }
+      long numOp = stol(num);
+      double numRe = sqrt(numOp);
+      return to_string(numRe);
+      break;
+    case '!':
+      /* code */
+      if (num.find("e") != string::npos || num.find("E") != string::npos ||
+          num.find(".") != string::npos) {
+        cout << "Invalid input!" << endl;
+        return NULL;
+        break;
+      }
+      long factorial = 1;
+      long numOp = stol(num);
+      for (int i = 1; i <= numOp; i++) {
+        factorial *= i;
+      }
+      return to_string(factorial);
+      break;
+    default:
+      cout << "Invalid input!" << endl;
+      return NULL;
+  }
+}
 
+string calculate(string num1, string num2, string biOperator) {
+    char op = biOperator.at(0);
+}

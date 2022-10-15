@@ -28,6 +28,7 @@ using namespace std;
 
 const string symbol = "+-*/^$!%()";
 const string biOperator = "+-*/^%";
+// const string unaOperator = "$!";
 
 map<string, string> customVarible;
 
