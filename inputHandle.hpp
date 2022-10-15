@@ -25,8 +25,6 @@
 
 using namespace std;
 
-tuple<char *, int, int, bool> preprocess(string str);
-
 string calculate(string num1, string num2, string biOperator);
 
 string calculate(string num, string unaOperator);
@@ -37,12 +35,12 @@ string calculate(string num, string unaOperator);
 #include <iostream>
 #include <tuple>
 
-/// @brief Convert string to char[] with in-progress validity check
-/// @param str: string
-/// @return array: char[]
-char *str2charl(string str);
+// /// @brief Convert string to char[] with in-progress validity check
+// /// @param str: string
+// /// @return array: char[]
+// char *str2charl(string str);
 
-/// @brief Input early check + preprocessing
+/// @brief Input preprocessing
 /// @param str: string, main() argv[1] or argv[2]
 /// @return tuple<string arrayHead, int arrayTail, int pLocation, bool
 /// isNegative>
@@ -59,6 +57,7 @@ tuple<string, int, int, bool> preprocess(string str);
 /// @param num2: multiplier
 /// @return length: max of length(num1) length(num2)
 int addZeros(string &num1, string &num2);
+int addZerosR(string &num1, string &num2);
 
 /// @brief add two string bit by bit, inspired by the article
 /// https://www.geeksforgeeks.org/karatsuba-algorithm-for-fast-multiplication-using-divide-and-conquer-algorithm/
@@ -86,5 +85,7 @@ string funcDivide(string num1, string num2);
 string funcMod(string num1, string num2);
 
 string funcAdd(string num1, string num2);
+
+string funcSub(string num1, string num2);
 
 string funcExp(string num1, string num2);

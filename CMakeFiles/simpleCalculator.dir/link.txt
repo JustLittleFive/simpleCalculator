@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/simpleCalculator.dir/src/calComponents.cpp.o CMakeFiles/simpleCalculator.dir/src/calFunc.cpp.o CMakeFiles/simpleCalculator.dir/src/calculator.cpp.o CMakeFiles/simpleCalculator.dir/src/preprocess.cpp.o CMakeFiles/simpleCalculator.dir/src/simpleCalculator.cpp.o -o bin/simpleCalculator 

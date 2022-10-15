@@ -15,22 +15,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <inputHandle.hpp>
+#include "headerCollections.hpp"
 
 using namespace std;
-
-/// @brief Convert string to char[]
-/// @param str: string
-/// @return array: char[]
-char *str2charl(string str) {
-  const char *input = str.c_str();
-  int len = str.length();
-  char *array = new char[len];
-  for (int i = 0; i < len; i++) {
-    array[i] = input[i];
-  }
-  return array;
-}
 
 /// @brief Input preprocessing
 /// @param str:  num in string type
@@ -41,6 +28,7 @@ char *str2charl(string str) {
 ///   @retval pLocation: decimal point position
 ///   @retval isNegative: the parity
 tuple<string, int, int, bool> preprocess(string str) {
+  tuple<string, int, int, bool> ret;
   bool isNegative = 0;
   if (str[0] == '-') {
     isNegative = 1;
@@ -65,7 +53,7 @@ tuple<string, int, int, bool> preprocess(string str) {
     numType = 3;
   } else {
     cout << "Invalid input!" << endl;
-    return;
+    return ret;
   }
 
   string arrayHead = "";
@@ -98,153 +86,219 @@ tuple<string, int, int, bool> preprocess(string str) {
         string strHead = str.substr(0, eLocation);
         if (rpLocation != string::npos) {
           strHead.erase(rpLocation, 1);
+          pLocation = strHead.length() - rpLocation;
         }
-        pLocation = strHead.length() - rpLocation;
         arrayHead = strHead;
         str.erase(eLocation, 1);
         string strTail = str.substr(eLocation, str.length());
-        arrayTail = stoi(str2charl(strTail));
+        arrayTail = stoi(strTail);
         break;
       } else {
         cout << "Invalid input!" << endl;
-        return;
+        return ret;
       }
       break;
     }
     default: {
       cout << "Invalid input!" << endl;
-      return;
+      return ret;
     }
   }
 
-  tuple<string, int, int, bool> ret =
-      make_tuple(arrayHead, arrayTail, pLocation, isNegative);
+  ret = make_tuple(arrayHead, arrayTail, pLocation, isNegative);
   return ret;
 }
 
-/// @brief Fill the digits with 0 to facilitate subsequent calculations,
-/// inspired by the article
-/// https://www.geeksforgeeks.org/karatsuba-algorithm-for-fast-multiplication-using-divide-and-conquer-algorithm/
-/// @param num1: multiplier
-/// @param num2: multiplier
-/// @return length: max of length(num1) length(num2)
-int addZeros(string &num1, string &num2) {
-  int l1 = num1.size();
-  int l2 = num2.size();
-  if (l1 > l2) {
-    for (int i = 0; i < l1 - l2; i++) {
-      num2 = ('0' + num2);
-    }
-  } else {
-    for (int i = 0; i < l2 - l1; i++) {
-      num1 = ('0' + num1);
-    }
+/**
+ * @brief Determine operator precedence
+ *
+ * @param symbol: formula operator
+ * @return int
+ * @retval return priority. The operator priority is divided into four levels,
+ * the high priority is the first to be popped off the stack
+ */
+int calcuLevel(string symbol) {
+  if (symbol.compare("+") == 0 || symbol.compare("-") == 0) {
+    return 1;
+  } else if (symbol.compare("*") == 0 || symbol.compare("/") == 0) {
+    return 2;
+  } else if (symbol.compare("$") == 0 || symbol.compare("^") == 0) {
+    return 3;
+  } else if (symbol.compare("!") == 0 || symbol.compare("%") == 0) {
+    return 4;
   }
-  return max(l1, l2);
+  return 0;
 }
 
-/// @brief add two string bit by bit, inspired by the article
-/// https://www.geeksforgeeks.org/karatsuba-algorithm-for-fast-multiplication-using-divide-and-conquer-algorithm/
-/// @param s1
-/// @param s2
-/// @return string
-string strAdd(string s1, string s2) {
-  int carrier = 0;
-  int bitresult = 0;
-  string fullResult = "";
-  string finalResult = "";
-  addZeros(s1, s2);
-  for (int i = s1.length() - 1; i >= 0; i--) {
-    bitresult = s1[i] - '0' + s2[i] - '0' + carrier;
-    carrier = 0;
-    if (bitresult > 9) {
-      carrier = 1;
-      bitresult = bitresult - 10;
+/**
+ * @brief Convert infix expression to suffix expression
+ *
+ * @param seglist: expression stored in vector in infix order
+ * @return list<string>: expression stored in list in suffix order
+ */
+list<string> suffixed(vector<string> seglist) {
+  list<string> suffix;
+  stack<string> symbolStack;
+  for (int i = 0; i < seglist.size(); i++) {
+    if (symbol.find(seglist[i]) == string::npos) {
+      suffix.push_back(seglist[i]);
+      continue;
     }
-    fullResult.push_back(bitresult + '0');
+    if (seglist[i].compare("(") == 0) {
+      symbolStack.push(seglist[i]);
+    } else if (seglist[i].compare(")") == 0) {
+      while (symbolStack.top().compare("(") != 0) {
+        suffix.push_back(symbolStack.top());
+        symbolStack.pop();
+      }
+      symbolStack.pop();
+    } else {
+      while (!symbolStack.empty() &&
+             calcuLevel(seglist[i]) <= calcuLevel(symbolStack.top())) {
+        suffix.push_back(symbolStack.top());
+        symbolStack.pop();
+      }
+      symbolStack.push(seglist[i]);
+    }
   }
-  if (carrier == 1) {
-    fullResult.push_back('1');
+  while (!symbolStack.empty()) {
+    suffix.push_back(symbolStack.top());
+    symbolStack.pop();
   }
-  for (int i = 0; i < fullResult.size(); i++) {
-    finalResult.push_back(fullResult[fullResult.size() - i - 1]);
-  }
-  // finalResult.push_back('\0');
-  int pos = finalResult.find_first_not_of('0');
-  if (pos != string::npos) {
-    finalResult = finalResult.substr(pos, finalResult.size() - pos);
-  } else {
-    finalResult = "0";
-  }
-  return finalResult;
+
+  return suffix;
 }
 
-/// @brief minus two string bit by bit, inspired by the article
-/// https://www.geeksforgeeks.org/karatsuba-algorithm-for-fast-multiplication-using-divide-and-conquer-algorithm/
-/// @param s1
-/// @param s2
-/// @return string
-string strMinus(string s1, string s2) {
-  int carrier = 0;
-  int bitresult = 0;
-  string fullResult = "";
-  string finalResult = "";
-  addZeros(s1, s2);
-  for (int i = s1.length() - 1; i >= 0; i--) {
-    bitresult = s1[i] - s2[i] - carrier;
-    carrier = 0;
-
-    if (bitresult < 0) {
-      carrier = 1;
-      bitresult = bitresult + 10;
+/**
+ * @brief The input initializer, deconstruct formulas into parameters and
+ * operators
+ *
+ * @param input
+ * @return vector<string>
+ */
+vector<string> initializer(string input) {
+  vector<string> seglist;
+  size_t prev = 0, pos;
+  while ((pos = input.find_first_of(symbol, prev)) != string::npos) {
+    // std::cout << "pos = " << pos << " prev = " << prev << endl;
+    if (pos > prev) {
+      seglist.push_back(input.substr(prev, pos - prev));
+      seglist.push_back(input.substr(pos, 1));
+    } else if (pos == prev) {
+      seglist.push_back(input.substr(pos, 1));
     }
-
-    fullResult.push_back(bitresult + '0');
+    prev = pos + 1;
   }
-  for (int i = 0; i < fullResult.size(); i++) {
-    finalResult.push_back(fullResult[fullResult.size() - i - 1]);
+  if (prev < input.length()) {
+    seglist.push_back(input.substr(prev, string::npos));
   }
-  int pos = finalResult.find_first_not_of('0');
-  if (pos != string::npos) {
-    finalResult = finalResult.substr(pos, finalResult.size() - pos);
-  } else {
-    finalResult = "0";
-  }
-  return finalResult;
+  return seglist;
 }
 
-/// @brief Karatsuba algorithm, inspired by the article
-/// https://www.geeksforgeeks.org/karatsuba-algorithm-for-fast-multiplication-using-divide-and-conquer-algorithm/
-/// @param str1
-/// @param str2
-/// @return string
-string karatsuba(string str1, string str2) {
-  int len = addZeros(str1, str2);
-
-  if (len == 1) {
-    return to_string(atoi(str1.c_str()) * atoi(str2.c_str()));
+/**
+ * @brief Input validity checker
+ *
+ * @param seglist
+ * @return true
+ * @return false
+ */
+bool validChecker(vector<string> &seglist) {
+  bool validCheck = true;
+  // Sqrt / negative sign transfer
+  for (int i = 0; i < seglist.size(); i++) {
+    if (seglist[i].compare("sqrt") == 0) {
+      if (i < seglist.size() - 1 &&
+          symbol.find(seglist[i + 1]) == string::npos) {
+        seglist[i] = "$";
+        seglist.erase(seglist.begin() + i + 1);
+        seglist.erase(seglist.begin() + i + 2);
+      } else {
+        std::cout << "sqrt sign transfer failure: Invalid input!" << endl;
+        validCheck = false;
+        break;
+      }
+    }
+    if (seglist[i].compare("-") == 0 &&
+        (i == 0 || biOperator.find(seglist[i - 1]) != string::npos)) {
+      if (i < seglist.size() - 1 &&
+          biOperator.find(seglist[i + 1]) == string::npos) {
+        seglist[i + 1] = "-" + seglist[i + 1];
+        seglist.erase(seglist.begin() + i);
+        i--;
+      } else {
+        std::cout << " negative sign transfer failure: Invalid input!" << endl;
+        validCheck = 0;
+        break;
+      }
+    }
+  }
+  if (!validCheck) {
+    return validCheck;
+  }
+  // Input variables / parenthesis pairing checker
+  int count = 0;
+  for (int i = 0; i < seglist.size(); i++) {
+    if (!regex_match(seglist[i],
+                     regex("(\\-){0,1}([0-9]+)(\\.[0-9]+){0,1}(\\e[0-9]+){0,1}",
+                           regex::icase)) &&
+        symbol.find(seglist[i]) == string::npos) {
+      map<string, string>::iterator l_it;
+      l_it = customVarible.find(seglist[i]);
+      if (l_it == customVarible.end()) {
+        cout << "regex_match failure: Invalid input!" << endl;
+        validCheck = false;
+        break;
+      }
+    }
+    if (seglist[i].compare("(") == 0) {
+      count++;
+    } else if (seglist[i].compare(")") == 0) {
+      count--;
+    }
+  }
+  if (count != 0) {
+    cout << "parenthesis pairing failure: Invalid input!" << endl;
+    validCheck = false;
+  }
+  if (!validCheck) {
+    return validCheck;
+  }
+  // Formula format checker
+  for (int i = 0; i < seglist.size() - 1; i++) {
+    if (i == 0 && biOperator.find(seglist[i]) != string::npos) {
+      cout << "format check failure: Invalid input!" << endl;
+      validCheck = false;
+      break;
+    }
+    if (biOperator.find(seglist[i]) != string::npos &&
+        seglist[i + 1].compare("-") != 0 &&
+        biOperator.find(seglist[i + 1]) != string::npos) {
+      cout << "format check failure: Invalid input!" << endl;
+      validCheck = false;
+      break;
+    }
+    if (seglist[i].compare("$") == 0 &&
+        (symbol.find(seglist[i + 1]) != string::npos ||
+         i == seglist.size() - 2)) {
+      cout << "format check failure: Invalid input!" << endl;
+      validCheck = false;
+      break;
+    }
+    if (seglist[i + 1].compare("!") == 0 &&
+        symbol.find(seglist[i]) != string::npos) {
+      cout << "format check failure: Invalid input!" << endl;
+      validCheck = false;
+      break;
+    }
+    if (i > 0 && symbol.find(seglist[i - 1]) != string::npos &&
+        symbol.find(seglist[i]) != string::npos &&
+        symbol.find(seglist[i - 1]) != string::npos &&
+        (seglist[i].compare("(") != 0 || seglist[i + 1].compare("$") != 0)) {
+      cout << "format check failure: Invalid input!" << endl;
+      validCheck = false;
+      break;
+    }
   }
 
-  int subLen = len / 2;
-  string a = str1.substr(0, subLen);
-  string b = str1.substr(subLen, len - subLen);
-  string c = str2.substr(0, subLen);
-  string d = str2.substr(subLen, len - subLen);
-
-  string ac = karatsuba(a, c);
-  string bd = karatsuba(b, d);
-  // string acPbd = strAdd(ac, bd);
-  // string adPbc = strAdd(karatsuba(a, d), karatsuba(b, c));
-  string aPbcPd = karatsuba(strAdd(a, b), strAdd(c, d));
-  string adPbc = strMinus(aPbcPd, strAdd(ac, bd));
-
-  int bitShift = len - subLen;
-  for (int i = 0; i < bitShift * 2; i++) {
-    ac = ac + '0';
-  }
-  for (int i = 0; i < bitShift; i++) {
-    adPbc = adPbc + '0';
-  }
-
-  return strAdd(strAdd(ac, adPbc), bd);
+  return validCheck;
 }
