@@ -59,7 +59,7 @@ string calculator(list<string> suffixList) {
 
 /**
  * @brief Unary operator evaluation function
- * 
+ *
  * @param num : variable
  * @param unaOperator : unary operator
  * @return string : result
@@ -72,27 +72,28 @@ string calculate(string num, string unaOperator) {
       tuple<string, int, int, bool> input;
       input = preprocess(num);
       if (get<3>(input)) {
-        cout << "Unsupported input!" << endl;
+        cout << "Invalid input!" << endl;
         return NULL;
         break;
       }
       int pLocate = get<2>(input);
-      if (pLocate != 0) {
-        cout << "Unsupported input!" << endl;
-        return NULL;
-        break;
-      }
       int e = get<1>(input);
       if (e != 0) {
         cout << "Unsupported input!" << endl;
         return NULL;
         break;
       }
-      string str = get<0>(input);
-      long numOp = stol(str);
-      double numRe = sqrt(numOp);
-      return to_string(numRe);
-      break;
+      if (pLocate != 0) {
+        double numOp = stod(num);
+        numOp = sqrt(numOp);
+        return to_string(numOp);
+        break;
+      } else {
+        long numOp = stol(num);
+        double numRe = sqrt(numOp);
+        return to_string(numRe);
+        break;
+      }
     }
     case '!': {
       /* factorial operator */
@@ -116,7 +117,7 @@ string calculate(string num, string unaOperator) {
         break;
       }
       string str = get<0>(input);
-      long long factorial = 1;
+      long factorial = 1;
       long numOp = stol(str);
       for (int i = 1; i <= numOp; i++) {
         factorial *= i;
@@ -133,7 +134,7 @@ string calculate(string num, string unaOperator) {
 
 /**
  * @brief Binary operator calculation function
- * 
+ *
  * @param num1 : variable 1
  * @param num2 : variable 2
  * @param biOperator : binary operator

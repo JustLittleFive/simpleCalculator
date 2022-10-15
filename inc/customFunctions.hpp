@@ -21,20 +21,24 @@
 
 using namespace std;
 
+// calculator's input processing functions
 bool validChecker(vector<string> &seglist);
 vector<string> initializer(string input);
 list<string> suffixed(vector<string> seglist);
-
 tuple<string, int, int, bool> preprocess(string str);
+
+//core component functions
 int addZeros(string &num1, string &num2);
 int addZerosR(string &num1, string &num2);
 string strAdd(string s1, string s2);
 string strMinus(string s1, string s2);
 
+// calculator mode overload functions
 string calculator(list<string> suffixList);
 string calculate(string num, string unaOperator);
 string calculate(string num1, string num2, string biOperator);
 
+// operation execution functions
 string funcAdd(string num1, string num2);
 string funcSub(string num1, string num2);
 string karatsuba(string str1, string str2);

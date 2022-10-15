@@ -58,11 +58,9 @@ string funcAdd(string num1, string num2) {
   int e1 = get<1>(input1), e2 = get<1>(input2);
   int exLocate = e1 - e2;
   if (exLocate > 0) {
-    e1 = e2;
     pLocate1 = pLocate1 - exLocate;
     exLocate = e2;
   } else {
-    e2 = e1;
     pLocate2 = pLocate2 - exLocate;
     exLocate = e1;
   }
@@ -71,7 +69,7 @@ string funcAdd(string num1, string num2) {
     intPart1 = s1;
   } else {
     if (pLocate1 < 0) {
-      for (pLocate1; pLocate1 < 0; pLocate1++) {
+      for ( ; pLocate1 < 0; pLocate1++) {
         s1 = s1 + "0";
       }
       intPart1 = s1;
@@ -84,7 +82,7 @@ string funcAdd(string num1, string num2) {
     intPart2 = s2;
   } else {
     if (pLocate2 < 0) {
-      for (pLocate2; pLocate2 < 0; pLocate2++) {
+      for ( ; pLocate2 < 0; pLocate2++) {
         s2 = s2 + "0";
       }
       intPart2 = s2;
@@ -153,11 +151,9 @@ string funcSub(string num1, string num2) {
   int e1 = get<1>(input1), e2 = get<1>(input2);
   int exLocate = e1 - e2;
   if (exLocate > 0) {
-    e1 = e2;
     pLocate1 = pLocate1 - exLocate;
     exLocate = e2;
   } else {
-    e2 = e1;
     pLocate2 = pLocate2 - exLocate;
     exLocate = e1;
   }
@@ -166,7 +162,7 @@ string funcSub(string num1, string num2) {
     intPart1 = s1;
   } else {
     if (pLocate1 < 0) {
-      for (pLocate1; pLocate1 < 0; pLocate1++) {
+      for ( ; pLocate1 < 0; pLocate1++) {
         s1 = s1 + "0";
       }
       intPart1 = s1;
@@ -179,7 +175,7 @@ string funcSub(string num1, string num2) {
     intPart2 = s2;
   } else {
     if (pLocate2 < 0) {
-      for (pLocate2; pLocate2 < 0; pLocate2++) {
+      for ( ; pLocate2 < 0; pLocate2++) {
         s2 = s2 + "0";
       }
       intPart2 = s2;
@@ -274,7 +270,7 @@ string funcDivide(string num2, string num1) {
       result = "0" + result;
     }
   } else {
-    for (rpLocation; rpLocation < 0; rpLocation++) {
+    for ( ; rpLocation < 0; rpLocation++) {
       result = result + "0";
     }
   }
@@ -425,6 +421,8 @@ string funcExp(string num1, string num2) {
     arr_i = 0;
     local = str2.length() - 1;
   }
+  delete[](arr);
+  arr = NULL;
   if (isNegative) {
     result = "-" + result;
   }
@@ -492,7 +490,7 @@ string karatsuba(string num1, string num2) {
       result = "0" + result;
     }
   } else {
-    for (rpLocation; rpLocation < 0; rpLocation++) {
+    for ( ; rpLocation < 0; rpLocation++) {
       result = result + "0";
     }
   }

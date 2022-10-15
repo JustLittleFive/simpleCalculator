@@ -207,11 +207,20 @@ bool validChecker(vector<string> &seglist) {
   // Sqrt / negative sign transfer
   for (int i = 0; i < seglist.size(); i++) {
     if (seglist[i].compare("sqrt") == 0) {
-      if (i < seglist.size() - 1 &&
-          symbol.find(seglist[i + 1]) == string::npos) {
+      int lo = 0;
+      if (i < seglist.size() - 1) {
+        if (seglist[i + 1].compare("(") == 0) {
+          for (int j = i + 1; j < seglist.size(); j++) {
+            if (seglist[j].compare(")") == 0) {
+              lo = j;
+              break;
+            }
+          }
+          if (lo != 0) {
+            seglist[i] = "$";
+          }
+        }
         seglist[i] = "$";
-        seglist.erase(seglist.begin() + i + 1);
-        seglist.erase(seglist.begin() + i + 2);
       } else {
         std::cout << "sqrt sign transfer failure: Invalid input!" << endl;
         validCheck = false;
@@ -278,7 +287,8 @@ bool validChecker(vector<string> &seglist) {
       break;
     }
     if (seglist[i].compare("$") == 0 &&
-        (symbol.find(seglist[i + 1]) != string::npos ||
+        (biOperator.find(seglist[i + 1]) != string::npos ||
+         unaOperator.find(seglist[i + 1]) != string::npos ||
          i == seglist.size() - 2)) {
       cout << "format check failure: Invalid input!" << endl;
       validCheck = false;
@@ -292,7 +302,7 @@ bool validChecker(vector<string> &seglist) {
     }
     if (i > 0 && symbol.find(seglist[i - 1]) != string::npos &&
         symbol.find(seglist[i]) != string::npos &&
-        symbol.find(seglist[i - 1]) != string::npos &&
+        symbol.find(seglist[i + 1]) != string::npos &&
         (seglist[i].compare("(") != 0 || seglist[i + 1].compare("$") != 0)) {
       cout << "format check failure: Invalid input!" << endl;
       validCheck = false;

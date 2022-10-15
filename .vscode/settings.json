@@ -4,6 +4,7 @@
         "*.tcc": "cpp",
         "sstream": "cpp",
         "tuple": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "new": "cpp"
     }
 }

@@ -20,9 +20,10 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
-#include <tuple>
 #include <list>
-#include <stack>
 #include <map>
 #include <regex>
+#include <stack>
+#include <tuple>
+
 #include <math.h>
