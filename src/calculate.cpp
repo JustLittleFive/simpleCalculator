@@ -16,7 +16,7 @@
  */
 
 #include <math.h>
-
+#include <inputHandle.hpp>
 #include <iostream>
 #include <list>
 #include <map>
@@ -69,4 +69,35 @@ string calculate(string num, string unaOperator) {
 
 string calculate(string num1, string num2, string biOperator) {
     char op = biOperator.at(0);
+    switch (op)
+    {
+    case '+':
+        return funcAdd(num1,num2); // use new func name
+        /* code */
+        break;
+    case '-':
+        return strMinus(num1, num2); // use new func name, hint: num2 - num1
+        /* code */
+        break;
+    case '*':
+        return karatsuba(num1, num2);
+        /* code */
+        break;
+    case '/':
+        return funcDivide(num1, num2);
+        /* code */
+        break;
+    case '^':
+        return funcExp(num1, num2);
+        /* code */
+        break;
+    case '%':
+        return funcMod(num1, num2);
+        /* code */
+        break;
+    
+    default:
+        cout << "Invalid input!" << endl;
+        return NULL;
+    }
 }

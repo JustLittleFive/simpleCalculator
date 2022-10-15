@@ -4,6 +4,8 @@
         "algorithm": "cpp",
         "string": "cpp",
         "tuple": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "limits": "cpp",
+        "*.tcc": "cpp"
     }
 }

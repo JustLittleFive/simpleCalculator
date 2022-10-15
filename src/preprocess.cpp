@@ -15,15 +15,11 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <iostream>
-#include <tuple>
+#include <inputHandle.hpp>
 
 using namespace std;
 
-/// @brief Convert string to char[] with in-progress validity check
+/// @brief Convert string to char[]
 /// @param str: string
 /// @return array: char[]
 char *str2charl(string str) {
@@ -31,26 +27,20 @@ char *str2charl(string str) {
   int len = str.length();
   char *array = new char[len];
   for (int i = 0; i < len; i++) {
-    if (str[i] < 48 || str[i] > 57) {
-      if (str[i] != 45) {
-        cout << "Invalid input!" << endl;
-        exit(0);
-      }
-    }
     array[i] = input[i];
   }
   return array;
 }
 
-/// @brief Input early check + preprocessing
-/// @param str: string, main() argv[1] or argv[2]
-/// @return tuple<char *arrayHead, int arrayTail, int pLocation, bool
+/// @brief Input preprocessing
+/// @param str:  num in string type
+/// @return tuple<string arrayHead, int arrayTail, int pLocation, bool
 /// isNegative>
 ///   @retval arrayHead: the input number, or its decimal part
 ///   @retval arrayTail: ths power part, if input by scientific notation
 ///   @retval pLocation: decimal point position
 ///   @retval isNegative: the parity
-tuple<char *, int, int, bool> inputHandle(string str) {
+tuple<string, int, int, bool> preprocess(string str) {
   bool isNegative = 0;
   if (str[0] == '-') {
     isNegative = 1;
@@ -75,17 +65,17 @@ tuple<char *, int, int, bool> inputHandle(string str) {
     numType = 3;
   } else {
     cout << "Invalid input!" << endl;
-    exit(0);
+    return;
   }
 
-  char *arrayHead = new char(0);
+  string arrayHead = "";
   int arrayTail = 0;
   int pLocation = 0;
 
   switch (numType) {
     case 1: {
       // array could be pure-num char list
-      arrayHead = str2charl(str);
+      arrayHead = str;
       break;
     }
     case 2: {
@@ -93,7 +83,7 @@ tuple<char *, int, int, bool> inputHandle(string str) {
       int rpLocation = str.find('.');
       str.erase(rpLocation, 1);
       pLocation = str.length() - rpLocation;
-      arrayHead = str2charl(str);
+      arrayHead = str;
       break;
     }
     case 3: {
@@ -103,69 +93,32 @@ tuple<char *, int, int, bool> inputHandle(string str) {
         eLocation = str.find('E');
       }
       int nLocation = str.find('-');
-      // dual validity check
       if (rpLocation < eLocation &&
           (nLocation == string::npos || (eLocation + 1) == nLocation)) {
-        // TODO(JustLittleFive): Should split string first
-        // DONE
         string strHead = str.substr(0, eLocation);
         if (rpLocation != string::npos) {
           strHead.erase(rpLocation, 1);
         }
         pLocation = strHead.length() - rpLocation;
-        arrayHead = str2charl(strHead);
+        arrayHead = strHead;
         str.erase(eLocation, 1);
         string strTail = str.substr(eLocation, str.length());
         arrayTail = stoi(str2charl(strTail));
         break;
       } else {
         cout << "Invalid input!" << endl;
-        exit(0);
+        return;
       }
       break;
     }
     default: {
       cout << "Invalid input!" << endl;
-      exit(0);
+      return;
     }
   }
 
-  // input check & convert: DONE
-  // OUTPUT: arryHead, arrayTail, plocation, isNegative
-  tuple<char *, int, int, bool> ret =
+  tuple<string, int, int, bool> ret =
       make_tuple(arrayHead, arrayTail, pLocation, isNegative);
-  return ret;
-}
-
-/// @brief mul two input bit by bit to aviod data loss
-/// @param array1: char[], input in char[] form
-/// @param array2: char[], input in char[] form
-/// @return ret: string, could it start with '.'? -> no
-string hugeMul(char *array1, char *array2) {
-  char res[strlen(array1) + strlen(array2)] = {0};
-  for (int i = strlen(array1) - 1; i >= 0; i--) {
-    for (int l = strlen(array2) - 1; l >= 0; l--) {
-      // -'0' converts char to number in real
-      // by minus/add '0's ascii so we can caculate directly
-      res[i + l + 1] += (array1[i] - '0') * (array2[l] - '0');
-      res[i + l] += res[i + l + 1] / 10;
-      res[i + l + 1] %= 10;
-    }
-  }
-  char retP[sizeof(res)] = {0};
-  for (int i = 0; i < sizeof(res); i++) {
-    retP[i] = res[i] + '0';
-  }
-  // hint: use string ret(retP) directly could possiblely include the unexpected val in memory, 
-  // then it will ruin the decimal point position calculation.
-  string ret = "";
-  for (int i = 0; i < sizeof(retP); i++) {
-    // use push_back() to avoid the hint
-    ret.push_back(retP[i]);
-  }
-  while (ret[0] == '0') {
-    ret.erase(0, 1);
-  }
   return ret;
 }
 
@@ -294,71 +247,4 @@ string karatsuba(string str1, string str2) {
   }
 
   return strAdd(strAdd(ac, adPbc), bd);
-}
-
-/// @brief A simple multiplier with full precision
-/// @param argc: int, should be 3
-/// @param argv: char[], 2 input parms
-/// @return state: state code 0 with output result to terminal
-int main(int argc, char *argv[]) {
-  string str1 = argv[1];
-  string str2 = argv[2];
-  // // input in debug mode with ostream:
-  // cout << "input" << endl;
-  // string str1 = "";
-  // string str2 = "";
-  // cin >> str1 >> str2;
-
-  tuple<char *, int, int, bool> input1;
-  tuple<char *, int, int, bool> input2;
-  input1 = inputHandle(str1);
-  input2 = inputHandle(str2);
-
-  // calculate result - or +
-  bool isNegative = get<3>(input1) ^ get<3>(input2);
-  // // calculate result value or its decimal part in native way
-  // string resHead = hugeMul(get<0>(input1), get<0>(input2));
-
-  // calculate using Karatsuba algorithm, pre-processing part
-  string array1 = "";
-  char *out1 = get<0>(input1);
-  for (int i = 0; i < sizeof(out1); i++) {
-    if (out1[i]) {
-      array1.push_back(out1[i]);
-    }
-  }
-  string array2 = "";
-  char *out2 = get<0>(input2);
-  for (int i = 0; i < sizeof(out2); i++) {
-    if (out2[i]) {
-      array2.push_back(out2[i]);
-    }
-  }
-
-  // calculate in Karatsuba algorithm
-  string resHead = karatsuba(array1, array2);
-
-  // calculate result power part
-  int resTail = get<1>(input1) + get<1>(input2);
-  // calculate decimal point position
-  int pLocation = get<2>(input1) + get<2>(input2);
-  // combine decimal part with decimal point
-  while (resHead.length() <= pLocation) {
-    resHead.insert(0, "0");
-  }
-  if (pLocation > 0) {
-    resHead.insert(resHead.length() - pLocation, ".");
-  }
-  // format output
-  cout << str1 << " * " << str2 << " = ";
-  if (isNegative) {
-    cout << '-';
-  }
-  cout << resHead;
-  if (resTail) {
-    cout << 'E' << resTail;
-  }
-  cout << endl;
-  /// @todo: combine the result into one object to store/transmit/reuse
-  return 0;
 }
